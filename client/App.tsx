@@ -1,5 +1,4 @@
 import "./global.css";
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,11 +9,14 @@ import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import Gender from "./pages/Gender";
 import DateOfBirth from "./pages/DateOfBirth";
+import Country from "./pages/Country";
+import HomeLocation from "./pages/homelocation";
+import ProfileAdd from "./pages/ProfileAdd";
 import Interest from "./pages/Interest";
 import Verification from "./pages/Verification";
 import Homee from "./pages/Homee";
 import Messages from "./pages/Messages";
-import Prof from "./pages/Prof";
+import Notification from "./pages/Notification";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,11 +34,14 @@ export default function App() {
             <Route path="/signin" element={<SignIn />} />
             <Route path="/gender" element={<Gender />} />
             <Route path="/date-of-birth" element={<DateOfBirth />} />
+            <Route path="/country" element={<Country />} />
+            <Route path="/homelocation" element={<HomeLocation />} />
+            <Route path="/profileadd" element={<ProfileAdd />} />
             <Route path="/interest" element={<Interest />} />
             <Route path="/Verification" element={<Verification />} />
             <Route path="/homee" element={<Homee />} />
             <Route path="/messages" element={<Messages />} />
-            <Route path="/profile" element={<Prof />} />
+            <Route path="/notification" element={<Notification />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
