@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import BottomNav from "@/components/BottomNav";
+import Stories, { type StoryItem } from "@/components/Stories";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import {
   Heart,
   MessageCircle,
@@ -20,6 +23,9 @@ import {
   Video,
   MoreHorizontal,
   Bookmark,
+  MapPin,
+  AlertTriangle,
+  Pin,
 } from "lucide-react";
 
 // --- Interfaces and Data ---
@@ -30,6 +36,7 @@ interface Post {
   timeAgo: string;
   content: string;
   image?: string;
+  video?: string;
   likes: number;
   isLiked: boolean;
   comments: number;
@@ -43,55 +50,55 @@ const discoveryContent = {
       id: "fy1",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1574629810360-15b565251e39?w=400",
+        "https://picsum.photos/seed/fy1/400",
     },
     {
       id: "fy2",
       type: "video",
       imageUrl:
-        "https://images.unsplash.com/photo-1517488629431-1a8b16c5642b?w=400",
+        "https://picsum.photos/seed/fy2/400",
     },
     {
       id: "fy3",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1551024709-8f237c20454d?w=400",
+        "https://picsum.photos/seed/fy3/400",
     },
     {
       id: "fy4",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400",
+        "https://picsum.photos/seed/fy4/400",
     },
     {
       id: "fy5",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1543353071-873f6b64b638?w=400",
+        "https://picsum.photos/seed/fy5/400",
     },
     {
       id: "fy6",
       type: "video",
       imageUrl:
-        "https://images.unsplash.com/photo-1529429617124-95b102e8675c?w=400",
+        "https://picsum.photos/seed/fy6/400",
     },
     {
       id: "fy7",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1626202157973-da3087289504?w=400",
+        "https://picsum.photos/seed/fy7/400",
     },
     {
       id: "fy8",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1587574933979-44b4c738c298?w=400",
+        "https://picsum.photos/seed/fy8/400",
     },
     {
       id: "fy9",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400",
+        "https://picsum.photos/seed/fy9/400",
     },
   ],
   sports: [
@@ -99,31 +106,31 @@ const discoveryContent = {
       id: "s1",
       type: "video",
       imageUrl:
-        "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400",
+        "https://picsum.photos/seed/s1/400",
     },
     {
       id: "s2",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400",
+        "https://picsum.photos/seed/s2/400",
     },
     {
       id: "s3",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1541252260730-0412e8e2108e?w=400",
+        "https://picsum.photos/seed/s3/400",
     },
     {
       id: "s4",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400",
+        "https://picsum.photos/seed/s4/400",
     },
     {
       id: "s5",
       type: "video",
       imageUrl:
-        "https://images.unsplash.com/photo-1543321269-9e42663e5222?w=400",
+        "https://picsum.photos/seed/s5/400",
     },
   ],
   cooking: [
@@ -131,25 +138,25 @@ const discoveryContent = {
       id: "c1",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1490645935967-10de6ba17021?w=400",
+        "https://picsum.photos/seed/c1/400",
     },
     {
       id: "c2",
       type: "video",
       imageUrl:
-        "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400",
+        "https://picsum.photos/seed/c2/400",
     },
     {
       id: "c3",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=400",
+        "https://picsum.photos/seed/c3/400",
     },
     {
       id: "c4",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1484723050470-b53b9f45c093?w=400",
+        "https://picsum.photos/seed/c4/400",
     },
   ],
   memes: [
@@ -157,19 +164,19 @@ const discoveryContent = {
       id: "m1",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?w=400",
+        "https://picsum.photos/seed/m1/400",
     },
     {
       id: "m2",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1593085512500-24127878a85a?w=400",
+        "https://picsum.photos/seed/m2/400",
     },
     {
       id: "m3",
       type: "video",
       imageUrl:
-        "https://images.unsplash.com/photo-1589254065909-b7086229d08c?w=400",
+        "https://picsum.photos/seed/m3/400",
     },
   ],
   travel: [
@@ -177,19 +184,19 @@ const discoveryContent = {
       id: "t1",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=400",
+        "https://picsum.photos/seed/t1/400",
     },
     {
       id: "t2",
       type: "video",
       imageUrl:
-        "https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=400",
+        "https://picsum.photos/seed/t2/400",
     },
     {
       id: "t3",
       type: "photo",
       imageUrl:
-        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=400",
+        "https://picsum.photos/seed/t3/400",
     },
   ],
 };
@@ -198,6 +205,15 @@ const interests = ["For You", "Sports", "Cooking", "Memes", "Travel"];
 
 // --- Component ---
 export default function HomePage() {
+  // --- Stories Data ---
+  const stories: StoryItem[] = [
+    { id: "st1", username: "john", avatar: "https://i.pravatar.cc/100?u=john", preview: "https://picsum.photos/seed/story1/300", hasNew: true },
+    { id: "st2", username: "sarah", avatar: "https://i.pravatar.cc/100?u=sarah", preview: "https://picsum.photos/seed/story2/300", hasNew: true },
+    { id: "st3", username: "mike", avatar: "https://i.pravatar.cc/100?u=mike", preview: "https://picsum.photos/seed/story3/300" },
+    { id: "st4", username: "alex", avatar: "https://i.pravatar.cc/100?u=alex", preview: "https://picsum.photos/seed/story4/300", hasNew: true },
+    { id: "st5", username: "emily", avatar: "https://i.pravatar.cc/100?u=emily", preview: "https://picsum.photos/seed/story5/300" },
+  ];
+
   // --- State Management ---
   const [activeTab, setActiveTab] = useState("follow");
   const [selectedInterest, setSelectedInterest] = useState("forYou");
@@ -205,11 +221,11 @@ export default function HomePage() {
     {
       id: "1",
       username: "johndoe",
-      userAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
+      userAvatar: "https://i.pravatar.cc/150?u=john",
       timeAgo: "2h",
       content: "Perfect morning coffee ☕ Nothing beats this view! Just discovered this amazing little café downtown.",
       image:
-        "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=500&h=500&fit=crop",
+        "https://picsum.photos/seed/post1/500/500",
       likes: 124,
       isLiked: false,
       comments: 23,
@@ -218,12 +234,12 @@ export default function HomePage() {
     {
       id: "2",
       username: "sarah_creates",
-      userAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
+      userAvatar: "https://i.pravatar.cc/150?u=sarah",
       timeAgo: "4h",
       content:
         "Working on some new art pieces today! Love the creative process 🎨✨ There's something magical about bringing ideas to life.",
       image:
-        "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=500&h=500&fit=crop",
+        "https://picsum.photos/seed/post2/500/500",
       likes: 287,
       isLiked: true,
       comments: 45,
@@ -232,7 +248,7 @@ export default function HomePage() {
     {
       id: "3",
       username: "travel_mike",
-      userAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=mike",
+      userAvatar: "https://i.pravatar.cc/150?u=mike",
       timeAgo: "6h",
       content:
         "Just discovered this amazing hidden gem in the city. Sometimes the best places are right under our noses! 🏛️",
@@ -244,12 +260,12 @@ export default function HomePage() {
     {
       id: "4",
       username: "foodie_alex",
-      userAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=alex",
+      userAvatar: "https://i.pravatar.cc/150?u=alex",
       timeAgo: "8h",
       content:
         "Homemade pasta night! 🍝 There's nothing more satisfying than making everything from scratch. Recipe in my bio!",
       image:
-        "https://images.unsplash.com/photo-1551782450-17144efb9c50?w=500&h=500&fit=crop",
+        "https://picsum.photos/seed/post3/500/500",
       likes: 156,
       isLiked: true,
       comments: 34,
@@ -257,16 +273,51 @@ export default function HomePage() {
     },
   ]);
 
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("letzo-draft-upload");
+      if (!raw) return;
+      const draft = JSON.parse(raw);
+      const base = {
+        id: String(Date.now()),
+        username: "you",
+        userAvatar: "https://i.pravatar.cc/150?u=you",
+        timeAgo: "now",
+        likes: 0,
+        isLiked: false,
+        comments: 0,
+        isBookmarked: false,
+      };
+      if (draft.type === "photo") {
+        setPosts((p) => [
+          { ...base, content: draft.caption || "", image: draft.url },
+          ...p,
+        ]);
+      } else if (draft.type === "video") {
+        setPosts((p) => [
+          { ...base, content: draft.caption || "", video: draft.url },
+          ...p,
+        ]);
+      } else if (draft.type === "snip") {
+        setPosts((p) => [
+          { ...base, content: draft.text || "" },
+          ...p,
+        ]);
+      }
+      localStorage.removeItem("letzo-draft-upload");
+    } catch { }
+  }, []);
+
   // --- Functions ---
   const toggleLike = (postId: string) => {
     setPosts(
       posts.map((post) =>
         post.id === postId
           ? {
-              ...post,
-              isLiked: !post.isLiked,
-              likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-            }
+            ...post,
+            isLiked: !post.isLiked,
+            likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+          }
           : post,
       ),
     );
@@ -293,11 +344,10 @@ export default function HomePage() {
     count?: number;
   }) => (
     <button
-      className={`relative px-4 py-3 font-medium text-sm transition-all duration-300 rounded-xl ${
-        activeTab === tabName
-          ? "text-red-600 bg-red-50"
-          : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-      }`}
+      className={`relative px-4 py-3 font-medium text-sm transition-all duration-300 rounded-xl ${activeTab === tabName
+        ? "text-red-600 bg-red-50"
+        : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+        }`}
       onClick={() => setActiveTab(tabName)}
     >
       <div className="flex items-center space-x-1">
@@ -325,7 +375,7 @@ export default function HomePage() {
         .hide-scrollbar-x::-webkit-scrollbar { display: none; }
         .hide-scrollbar-x { -ms-overflow-style: none; scrollbar-width: none; }
         
-        .snubo-card {
+        .letzo-card {
           background: white;
           border: 1px solid #e5e7eb;
           border-radius: 1rem;
@@ -333,11 +383,11 @@ export default function HomePage() {
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .snubo-card:hover {
+        .letzo-card:hover {
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
         
-        .snubo-button-primary {
+        .letzo-button-primary {
           background: #dc2626;
           color: white;
           padding: 0.5rem 1rem;
@@ -347,25 +397,25 @@ export default function HomePage() {
           box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
         
-        .snubo-button-primary:hover {
+        .letzo-button-primary:hover {
           background: #b91c1c;
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
           transform: scale(0.98);
         }
         
-        .snubo-button-ghost {
+        .letzo-button-ghost {
           color: #6b7280;
           padding: 0.5rem;
           border-radius: 0.75rem;
           transition: all 0.2s;
         }
         
-        .snubo-button-ghost:hover {
+        .letzo-button-ghost:hover {
           background: #f3f4f6;
           color: #374151;
         }
         
-        .snubo-input {
+        .letzo-input {
           background: #f9fafb;
           border: 1px solid #e5e7eb;
           border-radius: 0.75rem;
@@ -374,17 +424,17 @@ export default function HomePage() {
           transition: all 0.2s;
         }
         
-        .snubo-input.search-input {
+        .letzo-input.search-input {
           padding-left: 4rem;
         }
         
-        .snubo-input:focus {
+        .letzo-input:focus {
           outline: none;
           border-color: #dc2626;
           box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
         }
         
-        .snubo-input::placeholder {
+        .letzo-input::placeholder {
           color: #9ca3af;
         }
         
@@ -415,10 +465,10 @@ export default function HomePage() {
           <div className="flex items-center justify-between max-w-md mx-auto">
             <div className="flex items-center">
               <h1 className="font-brand font-semibold text-2xl text-red-600">
-                Snubo
+                Letzo
               </h1>
             </div>
-            
+
             <div className="flex items-center space-x-1">
               <TabButton tabName="follow">
                 <span>Follow</span>
@@ -430,8 +480,8 @@ export default function HomePage() {
                 <span>Snip</span>
               </TabButton>
             </div>
-            
-            <button className="snubo-button-ghost">
+
+            <button className="letzo-button-ghost">
               <Menu size={20} />
             </button>
           </div>
@@ -442,12 +492,45 @@ export default function HomePage() {
           {/* Follow Tab Content */}
           {activeTab === "follow" && (
             <div className="space-y-6 pt-2">
+              {/* Stories */}
+              <Stories items={stories} />
+
+              {/* Pinned Help Alert */}
+              <div className="mx-4">
+                <div className="p-[1px] rounded-2xl" style={{ background: "linear-gradient(135deg, #fde68a, #fca5a5, #c7d2fe)" }}>
+                  <div className="letzo-card rounded-2xl p-4 bg-white">
+                    <Alert className="border-0 p-0">
+                      <div className="flex items-start">
+                        <div className="mr-3 text-red-600">
+                          <AlertTriangle size={22} />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <Pin size={16} className="text-red-600" />
+                            <AlertTitle className="font-ui font-semibold text-primary">Urgent Help Needed — Blood Donation</AlertTitle>
+                          </div>
+                          <AlertDescription className="mt-1 text-secondary">
+                            O+ blood required near Dehradun today. If you or someone you know can help, please reach out. Every minute counts.
+                          </AlertDescription>
+                          <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
+                            <MapPin size={16} />
+                            <span>Dehradun, Uttarakhand</span>
+                          </div>
+                          <div className="mt-4 flex items-center gap-2">
+                            <button className="letzo-button-primary">Offer help</button>
+                            <button className="letzo-button-ghost px-3 py-2">Share</button>
+                          </div>
+                        </div>
+                      </div>
+                    </Alert>
+                  </div>
+                </div>
+              </div>
               {posts.map((post, index) => (
                 <article
                   key={post.id}
-                  className={`snubo-card mx-4 overflow-hidden ${
-                    index === 0 ? "shadow-glow" : ""
-                  }`}
+                  className={`letzo-card mx-4 overflow-hidden ${index === 0 ? "shadow-glow" : ""
+                    }`}
                 >
                   {/* Post Header */}
                   <div className="flex items-center justify-between p-4 pb-3">
@@ -470,7 +553,7 @@ export default function HomePage() {
                         </p>
                       </div>
                     </div>
-                    <button className="snubo-button-ghost p-2">
+                    <button className="letzo-button-ghost p-2">
                       <MoreHorizontal size={18} />
                     </button>
                   </div>
@@ -493,17 +576,27 @@ export default function HomePage() {
                     </div>
                   )}
 
+                  {/* Post Video */}
+                  {!post.image && post.video && (
+                    <div className="relative overflow-hidden">
+                      <video
+                        src={post.video}
+                        className="w-full h-80 object-cover"
+                        controls
+                      />
+                    </div>
+                  )}
+
                   {/* Post Actions */}
                   <div className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-1">
                         <button
                           onClick={() => toggleLike(post.id)}
-                          className={`flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-200 ${
-                            post.isLiked
-                              ? "bg-red-50 text-red-600"
-                              : "hover:bg-gray-100 text-secondary"
-                          }`}
+                          className={`flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-200 ${post.isLiked
+                            ? "bg-red-50 text-red-600"
+                            : "hover:bg-gray-100 text-secondary"
+                            }`}
                         >
                           <Heart
                             size={20}
@@ -511,24 +604,23 @@ export default function HomePage() {
                           />
                           <span className="text-sm font-medium">{post.likes}</span>
                         </button>
-                        
+
                         <button className="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-100 text-secondary transition-colors duration-200">
                           <MessageCircle size={20} />
                           <span className="text-sm font-medium">{post.comments}</span>
                         </button>
-                        
-                        <button className="snubo-button-ghost p-2">
+
+                        <button className="letzo-button-ghost p-2">
                           <Share size={20} />
                         </button>
                       </div>
-                      
+
                       <button
                         onClick={() => toggleBookmark(post.id)}
-                        className={`p-2 rounded-xl transition-all duration-200 ${
-                          post.isBookmarked
-                            ? "bg-red-50 text-red-600"
-                            : "hover:bg-gray-100 text-secondary"
-                        }`}
+                        className={`p-2 rounded-xl transition-all duration-200 ${post.isBookmarked
+                          ? "bg-red-50 text-red-600"
+                          : "hover:bg-gray-100 text-secondary"
+                          }`}
                       >
                         <Bookmark size={20} className={post.isBookmarked ? "fill-current" : ""} />
                       </button>
@@ -547,7 +639,7 @@ export default function HomePage() {
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted" size={18} />
                   <input
                     type="text"
-                    className="snubo-input search-input w-full"
+                    className="letzo-input search-input w-full"
                     placeholder="Search interests, people, and more..."
                   />
                 </div>
@@ -561,12 +653,11 @@ export default function HomePage() {
                     <button
                       key={interest}
                       onClick={() => setSelectedInterest(interestKey)}
-                      className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 flex-shrink-0 ${
-                        selectedInterest === interestKey
-                          ? "bg-red-600 text-white"
-                          : "bg-white text-secondary hover:text-primary border border-light"
-                      }`}
-                      style={{ 
+                      className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 flex-shrink-0 ${selectedInterest === interestKey
+                        ? "bg-red-600 text-white"
+                        : "bg-white text-secondary hover:text-primary border border-light"
+                        }`}
+                      style={{
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
                       }}
                     >
@@ -584,7 +675,7 @@ export default function HomePage() {
                   <div
                     key={item.id}
                     className="aspect-square relative cursor-pointer group rounded-xl overflow-hidden"
-                    style={{ 
+                    style={{
                       boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
                       transition: 'all 0.3s'
                     }}
@@ -655,15 +746,15 @@ export default function HomePage() {
               ].map((item) => (
                 <div
                   key={item.title}
-                  className="snubo-card p-5 cursor-pointer group hover:scale-102 transition-all duration-300"
+                  className="letzo-card p-5 cursor-pointer group hover:scale-102 transition-all duration-300"
                   style={{ transform: 'scale(1)', transition: 'all 0.3s' }}
                   onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.02)'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
                 >
                   <div className="flex items-center mb-4">
-                    <div 
+                    <div
                       className="w-12 h-12 flex items-center justify-center text-white rounded-xl"
-                      style={{ 
+                      style={{
                         background: item.color,
                         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                       }}
@@ -695,47 +786,7 @@ export default function HomePage() {
           )}
         </main>
 
-        {/* Enhanced Bottom Navigation */}
-        <nav className="flex-shrink-0 fixed bottom-0 left-0 right-0 bg-white bg-opacity-95 backdrop-blur-md border-t border-light" style={{ boxShadow: '0 -4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
-          <div className="flex items-center justify-around max-w-md mx-auto py-3 px-4">
-            <button className="flex flex-col items-center space-y-1 p-2 rounded-xl bg-red-50 text-red-600">
-              <Home size={22} />
-              <span className="text-xs font-medium">Home</span>
-            </button>
-            
-            <Link 
-              to="/messages"
-              className="flex flex-col items-center space-y-1 p-2 rounded-xl hover:bg-gray-100 text-secondary transition-colors"
-            >
-              <MessageSquare size={22} />
-              <span className="text-xs font-medium">Messages</span>
-            </Link>
-            
-            <button 
-              className="relative p-4 text-white rounded-2xl transition-all duration-300 active:scale-95"
-              style={{ 
-                background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-              }}
-            >
-              <Plus size={24} />
-            </button>
-            
-            <button className="flex flex-col items-center space-y-1 p-2 rounded-xl hover:bg-gray-100 text-secondary transition-colors relative">
-              <Bell size={22} />
-              <span className="text-xs font-medium">Notifications</span>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full"></div>
-            </button>
-            
-            <Link
-              to="/profile"
-              className="flex flex-col items-center space-y-1 p-2 rounded-xl hover:bg-gray-100 text-secondary transition-colors"
-            >
-              <User size={22} />
-              <span className="text-xs font-medium">Profile</span>
-            </Link>
-          </div>
-        </nav>
+        <BottomNav isHome={true} />
       </div>
     </>
   );
