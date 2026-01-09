@@ -12,15 +12,30 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const validateEmail = (email: string) => {
+  const validateEmail = (identifier: string) => {
+    if (!identifier) {
+      return { isValid: false, message: "Email, number, or user ID is required" };
+    }
+    
+    // Check if it's a valid email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      return { isValid: false, message: "Email is required" };
+    if (emailRegex.test(identifier)) {
+      return { isValid: true, message: "Valid email address" };
     }
-    if (!emailRegex.test(email)) {
-      return { isValid: false, message: "Please enter a valid email address" };
+    
+    // Check if it's a number (numeric only)
+    const numberRegex = /^\d+$/;
+    if (numberRegex.test(identifier)) {
+      return { isValid: true, message: "Valid number" };
     }
-    return { isValid: true, message: "Valid email address" };
+    
+    // Check if it's a user ID (alphanumeric, at least 3 characters)
+    const userIdRegex = /^[a-zA-Z0-9_]{3,}$/;
+    if (userIdRegex.test(identifier)) {
+      return { isValid: true, message: "Valid user ID" };
+    }
+    
+    return { isValid: false, message: "Please enter a valid email, number, or user ID" };
   };
 
   const validatePassword = (password: string) => {
@@ -77,16 +92,16 @@ export default function SignIn() {
 
           {/* Welcome Message */}
           <div className="space-y-4 animate-fade-in">
-            <h1 className="font-inknut font-bold text-3xl sm:text-4xl text-snubo-red">
+            <h1 className="font-inknut font-bold text-3xl sm:text-4xl text-letzo-red">
               Welcome Back!
             </h1>
             <p className="font-istok text-lg sm:text-xl text-gray-700 max-w-sm mx-auto leading-relaxed">
               to the social world
             </p>
             <div className="flex items-center justify-center space-x-2 mt-6">
-              <div className="w-2 h-2 bg-snubo-red rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-snubo-red rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-              <div className="w-2 h-2 bg-snubo-red rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              <div className="w-2 h-2 bg-letzo-red rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-letzo-red rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-2 h-2 bg-letzo-red rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
             </div>
           </div>
         </div>
@@ -105,11 +120,11 @@ export default function SignIn() {
       <div className="w-full max-w-sm sm:max-w-md mx-auto flex flex-col items-center text-center space-y-4 sm:space-y-6">
         {/* Logo */}
         <div className="space-y-1 sm:space-y-2">
-          <h1 className="font-inknut font-semibold text-4xl sm:text-5xl lg:text-6xl text-snubo-red drop-shadow-lg">
-            Snubo
+          <h1 className="font-inknut font-semibold text-4xl sm:text-5xl lg:text-6xl text-letzo-red drop-shadow-lg">
+            Letzzo
           </h1>
           <p className="font-istok text-sm sm:text-base lg:text-lg text-black">
-            Designed for good.
+            Find your kind of people, anywhere..
           </p>
         </div>
 
@@ -122,7 +137,7 @@ export default function SignIn() {
           <div className="space-y-4">
             <ValidatedInput
               type="text"
-              placeholder="Email"
+              placeholder="Email, Number, or User ID"
               value={formData.email}
               onChange={(value) => setFormData(prev => ({ ...prev, email: value }))}
               validation={validateEmail}
@@ -153,7 +168,7 @@ export default function SignIn() {
             disabled={!isFormValid() || isLoading}
             className={`w-full font-inknut font-semibold text-sm lg:text-base py-3 sm:py-4 px-6 sm:px-8 rounded-full shadow-lg transition-colors mt-6 ${
               isFormValid() && !isLoading
-                ? 'bg-snubo-red text-white hover:bg-red-600' 
+                ? 'bg-letzo-red text-white hover:bg-red-600' 
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
@@ -172,7 +187,7 @@ export default function SignIn() {
             <span className="font-inclusive text-sm text-black">Don't have an account? </span>
             <Link 
               to="/signup" 
-              className="font-inknut font-semibold text-sm text-snubo-red hover:text-red-600 transition-colors"
+              className="font-inknut font-semibold text-sm text-letzo-red hover:text-red-600 transition-colors"
             >
               Create Account
             </Link>
@@ -182,7 +197,7 @@ export default function SignIn() {
           <div className="text-center mt-2">
             <Link 
               to="/"
-              className="font-inclusive text-sm text-gray-600 hover:text-snubo-red transition-colors"
+              className="font-inclusive text-sm text-gray-600 hover:text-letzo-red transition-colors"
             >
               ← Back to Welcome
             </Link>
